@@ -1,2 +1,2 @@
 # SNAKE
-A simple game of "snake", built with python.pygame
+A simple version of "snake" game, built with python.pygame
