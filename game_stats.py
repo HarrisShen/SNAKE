@@ -2,11 +2,15 @@ class GameStats():
 	
 	def __init__(self, ai_settings):
 		self.ai_settings = ai_settings
-		self.score = 0
-		self.level = 1
-		self.game_active = True
+		self.high_score = 0
 		self.game_status = 'start'
-		self.status = ['start', 'active', 'end']
+		self.status = ['start', 'game', 'end']
+		self.initialize_dynamic_stats()
+	
+	def initialize_dynamic_stats(self):
+		self.score = 0
+		self.level = 1	
+		self.game_active = False	
 		
 	def update_level(self):
 		if self.score < 5:

@@ -8,27 +8,40 @@ from game_stats import GameStats
 class SnakeBody():
 	
 	def __init__(self, ai_settings, screen):
+		self.ai_settings = ai_settings
 		self.screen = screen		
 		# set body pos, size and color
 		self.rect =  pygame.Rect(0, 0, 
 			ai_settings.cube_size, ai_settings.cube_size)
-		self.gen_random_pos()
 		self.color = (0, 255, 0)
+		
+		self.create_new()
+	
+	def create_new(self):
+		self.gen_random_pos()
+		self.last_pos = self.get_pos()
 		self.cnt = 0
-		self.crt_dir = random.choice(list(ai_settings.dirs.values()))
+		self.crt_dir = random.choice(list(self.ai_settings.dirs.values()))
 		self.nxt_dir = self.crt_dir
 		self.footstep = []
 		self.body = []
-		self.first_cnt = True
-	
-	def update(self, ai_settings):
+		self.first_frame = True
+		self.hit = False
+		
+	def update(self, ai_settings, stats, foody):
+		self.update_pos(ai_settings, stats)
+		self.eat_food(ai_settings, stats, foody)
+		
+	def update_pos(self, ai_settings, stats):
 		if self.cnt == ai_settings.game_speed:
 			self.crt_dir = self.nxt_dir
+			self.last_pos = self.get_pos()
 			self.footstep.insert(0, (self.rect.left, self.rect.top))
 			if len(self.footstep) > 400:
 				self.footstep.pop()
 			self.rect.left += ai_settings.step * self.crt_dir[0]
 			self.rect.top += ai_settings.step * self.crt_dir[1]
+			self.hit_end(stats)
 			self.cnt = 0
 		elif self.cnt < ai_settings.game_speed:
 			self.cnt += 1
@@ -54,28 +67,35 @@ class SnakeBody():
 		# generate a position that won't easily die
 		return 0
 
-	def eat_food(self, ai_settings, stats, foody, mb):
+	def eat_food(self, ai_settings, stats, foody):
 		# eat the food just when step into it
 		if self.get_pos() == foody.get_pos():
-			foody.update(stats, self)
+			foody.create_new(stats, self)
 			stats.score += 1
-			mb.prep_score()
+			if stats.score > stats.high_score:
+				stats.high_score = stats.score
 			stats.update_level()
 			stats.update_game_speed(ai_settings)
 	
-	def hit_wall(self, stats, mb):
+	def hit_wall(self):
 		if self.rect.left < 10 or self.rect.top < 10\
 			or self.rect.left > 250 or self.rect.top > 250:
-			print("Press Q to quit")
-			stats.game_active = False
-			mb.show_end()
+			self.hit = True
 	
-	def hit_self(self, stats, mb):
+	def hit_self(self, stats):
 		for step in self.footstep[:stats.score]:
-			if self.get_pos() == step:
-				print("Press Q to quit")
-				stats.game_active = False
-				mb.show_end()
+			if step == (self.rect.left, self.rect.top):
+				self.hit = True
+	
+	def hit_end(self, stats):
+		self.hit_wall()
+		self.hit_self(stats)
+		if self.hit:
+			self.rect.left = self.last_pos[0]
+			self.rect.top = self.last_pos[1]
+			self.footstep.pop(0)
+			stats.game_active = False
+			stats.game_status = 'end'			
 				
 	def up_down(self, ai_settings):
 		if self.crt_dir == ai_settings.dirs['up']:

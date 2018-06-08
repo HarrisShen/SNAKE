@@ -27,17 +27,24 @@ def run_game():
 	# create a messageboard
 	mb = MessageBoard(ai_settings, stats, screen)
 	
-	# draw first frame - show start point
-	gf.update_screen(ai_settings, stats, screen, snake, foody, mb)
-	pygame.time.delay(500)
+	# start game
+	while stats.game_status == 'start':
+		gf.draw_start_screen(ai_settings, stats, screen, mb)
+		gf.check_start_event(ai_settings, stats)
 	
 	# main loop
 	while True:
 		
 		# monitor keyboard and mouse event
-		gf.check_events(ai_settings, stats, snake)
+		gf.check_events(ai_settings, stats, screen, 
+			snake, foody, mb)
+		gf.update_screen(ai_settings, stats, screen, snake, foody, mb)
+		# pause a little while for first frame
+		if snake.first_frame:
+			pygame.time.delay(300)
+			snake.first_frame = False
 		if stats.game_active:
-			gf.update_screen(ai_settings, stats, screen, 
-				snake, foody, mb)
+			snake.update(ai_settings, stats, foody)
+		
 		
 run_game()
