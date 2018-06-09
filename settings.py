@@ -5,7 +5,10 @@ class Settings():
 		self.screen_width = 270
 		self.screen_height = 300
 		self.bg_color = (0, 0, 0)
+		
 		self.wall_color = (255, 255, 255)
+		
+		# snake settings
 		self.cube_size = 10
 		self.step = 12
 		# 'dirs' stands for directions 
@@ -14,8 +17,17 @@ class Settings():
 			'down': (0, 1),
 			'left': (-1, 0),
 			'right': (1, 0)}
-		self.speed_of_level = [1000, 750, 560, 420, 315, 235, 175, 133]
+		
+		# game settings
 		self.initialize_dynamic_settings()
 		
 	def initialize_dynamic_settings(self):
 		self.game_speed = 1000
+		self.speed_list = [self.game_speed, 0, 0, 0, 0, 0, 0, 0]
+		self.acc_factor = 0.75
+		self.fill_speed_list()
+		
+	def fill_speed_list(self):
+		for level in range(1, 7):
+			self.speed_list[level] = int(self.acc_factor *\
+				self.speed_list[level-1])

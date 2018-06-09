@@ -11,14 +11,41 @@ def check_events(ai_settings, stats, screen, snake_body, foody, mb):
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_q:
-				sys.exit()
-			elif event.key == pygame.K_p:
+				# quit game, close window
+				if stats.game_status == 'start':
+					sys.exit()
+			elif event.key == pygame.K_SPACE:
+				# pause the game
 				if stats.game_status == 'game':
 					stats.game_active = not stats.game_active
-			elif event.key == pygame.K_r:
-				if stats.game_status == 'end':
+				# restart the game
+				elif stats.game_status == 'end':
 					reset_game(ai_settings, stats, screen,
 						snake_body, foody, mb)
+			elif event.key == pygame.K_RETURN:
+				# start a game
+				if stats.game_status == 'start':
+					stats.game_active = True
+					stats.game_status = 'game'
+					reset_game(ai_settings, stats, screen,
+						snake_body, foody, mb)
+				# confirm to quit a game
+				elif stats.game_status == 'confirm':
+					stats.game_status = 'start'
+			elif event.key == pygame.K_ESCAPE:
+				# quit game after it ends
+				if stats.game_status == 'end':
+					stats.game_active = False
+					stats.game_status = 'start'
+				# get ready to quit a game
+				elif stats.game_status == 'game':
+					stats.game_active = False
+					stats.game_status = 'confirm'
+				# false alarm, resume game
+				elif stats.game_status == 'confirm':
+					stats.game_active = True
+					stats.game_status = 'game'
+			# control the direction of the snake
 			elif event.key == pygame.K_DOWN:
 				if stats.game_active:
 					if snake_body.up_down(ai_settings) == False:
@@ -35,21 +62,16 @@ def check_events(ai_settings, stats, screen, snake_body, foody, mb):
 				if stats.game_active:
 					if snake_body.up_down(ai_settings) == True:
 						snake_body.nxt_dir = ai_settings.dirs['right']
-
-def check_start_event(ai_settings, stats):
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			sys.exit()
-		elif event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_q:
-				sys.exit()
-			elif event.key == pygame.K_RETURN or\
-				event.key == pygame.K_SPACE:
-				stats.game_active = True
-				stats.game_status = 'game'
-				
+	
 def update_screen(ai_settings, stats, screen, snake_body, foody, mb):
-	# re-paint screen in each loop
+	if stats.game_status == 'start':
+		draw_start_screen(ai_settings, stats, screen, mb)
+	else:
+		update_game_screen(ai_settings, stats, screen, 
+			snake_body, foody, mb)
+		
+def update_game_screen(ai_settings, stats, screen, snake_body, foody, mb):
+	# re-paint screen in each loop when game is on
 	screen.fill(ai_settings.bg_color)
 	draw_wall(ai_settings, screen)
 	snake_body.drawme(ai_settings, stats)
@@ -75,9 +97,14 @@ def draw_wall(ai_settings, screen):
 	pygame.draw.rect(screen, ai_settings.wall_color, rt_wall)
 
 def reset_game(ai_settings, stats, screen, snake_body, foody, mb):
+	# re-initialize settins and stats
 	ai_settings.initialize_dynamic_settings()
 	stats.initialize_dynamic_stats()
+	
+	# re-create snake and food
 	snake_body.create_new()
 	foody.create_new(stats, snake_body)
+	
+	# reset flags
 	stats.game_active = True
 	stats.game_status = 'game'
