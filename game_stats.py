@@ -1,13 +1,15 @@
 from math import log
 
-class GameStats():
-	
+
+class GameStats:
 	def __init__(self):
 		self.high_score = 0
 		self.game_status = 'start'
 		self.status = ['start', 'game', 'confirm', 'end']
-		self.initialize_dynamic_stats()
-	
+		self.score = 0
+		self.level = 0
+		self.game_active = False
+
 	def initialize_dynamic_stats(self):
 		self.score = 0
 		self.level = 0	

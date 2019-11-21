@@ -1,7 +1,7 @@
 import pygame.font
 
-class MessageBoard():
-	
+
+class MessageBoard:
 	def __init__(self, ai_settings, stats, screen):
 		self.screen = screen
 		self.screen_rect = screen.get_rect()
