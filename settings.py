@@ -18,13 +18,13 @@ class Settings:
         }
 
         # game settings
-        self.game_speed = 1000
+        self.game_speed = 30
         self.speed_list = [self.game_speed, 0, 0, 0, 0, 0, 0, 0]
         self.acc_factor = 0.75
         self.fill_speed_list()
 
     def initialize_dynamic_settings(self):
-        self.game_speed = 1000
+        self.game_speed = 30
         self.speed_list = [self.game_speed, 0, 0, 0, 0, 0, 0, 0]
         self.acc_factor = 0.75
         self.fill_speed_list()

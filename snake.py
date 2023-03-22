@@ -28,6 +28,8 @@ def run_game():
     # create a message board
     mb = MessageBoard(ai_settings, stats, screen)
 
+    clock = pygame.time.Clock()
+
     # main loop
     while True:
 
@@ -42,6 +44,7 @@ def run_game():
             snake.first_frame = False
         # update snake when game is on
         if stats.game_active:
+            clock.tick(100)
             snake.update(ai_settings, stats, food)
 
 
